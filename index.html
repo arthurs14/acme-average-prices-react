@@ -38,7 +38,7 @@
       }
 
       const Products = ({ products }) => {
-        console.log(products);
+        //console.log(products);
         return (
           <div id="product-list">
             <h1>Products</h1>
@@ -47,7 +47,13 @@
                 products.map(product =>
                 <li key={product.id}>
                   Product: {product.name} <br />
-                  Suggestedprice: ${product.suggestedPrice.toFixed(2)}
+                  Suggested Price: ${product.suggestedPrice.toFixed(2)} <br />
+                  Average Price: ${
+                    (product.companies.reduce((acc, price) => acc += price.price, 0) / product.companies.length).toFixed(2)
+                  } <br />
+                  Lowest Price: ${
+                    product.companies.reduce((acc, price) => acc < price.price ? acc : price.price ).toFixed(2)
+                  }
                 </li>)
               }
             </ul>
