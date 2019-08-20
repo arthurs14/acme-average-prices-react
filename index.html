@@ -41,8 +41,6 @@
           return average;
         });
         const average = totals.reduce((acc, num) => acc += num ,0) / totals.length;
-        console.log(totals);
-        console.log(average);
         return (
           <div>
           We have {products.length} products with an average price of
@@ -52,7 +50,6 @@
       }
 
       const Products = ({ products }) => {
-        //console.log(products);
         return (
           <div id="product-list">
             <h1>Products</h1>
