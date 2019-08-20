@@ -2,7 +2,10 @@
 <html>
   <head>
     <style>
-    
+      .nav {
+        display: flex;
+        justify-content: space-around;
+      }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
@@ -12,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
   </head>
   <body>
+    <h1>Acme Product Averages React</h1>
     <div id="root"></div>
     <script type="text/babel">
       const { render } = ReactDOM;
@@ -33,9 +37,21 @@
         );
       }
 
-      const Products = () => {
+      const Products = ({ products }) => {
+        console.log(products);
         return (
-          <h1>Products Page</h1>
+          <div id="product-list">
+            <h1>Products</h1>
+            <ul>
+              {
+                products.map(product =>
+                <li key={product.id}>
+                  Product: {product.name} <br />
+                  Suggestedprice: ${product.suggestedPrice.toFixed(2)}
+                </li>)
+              }
+            </ul>
+          </div>
         );
       }
 
@@ -43,18 +59,44 @@
         constructor() {
           super();
           this.state = {
-            companies: [],
-            products: [],
-            offerings: []
+            products: []
           }
         }
 
+        async componentDidMount() {
+          const urls = [
+            'https://acme-users-api-rev.herokuapp.com/api/companies',
+            'https://acme-users-api-rev.herokuapp.com/api/products',
+            'https://acme-users-api-rev.herokuapp.com/api/offerings'
+          ];
+
+          const responses = await Promise.all(urls.map(url => axios.get(url)));
+
+          const [ companies, products, offerings ] = responses.map(response => response.data);
+
+          const product = products.map(product => {
+            const offers = offerings.filter(offering => {
+              return product.id === offering.productId;
+            })
+            const company = offers.map(offer => {
+              const findCompany = companies.filter(_company => {
+                return _company.id === offer.companyId;
+              })
+              return {...offer, company: findCompany}
+            })
+            return {...product, companies: company};
+          })
+
+          this.setState({ products: product });
+        }
+
         render() {
+          const { products } = this.state;
           return (
             <HashRouter>
               <Route render={() => <Nav /> } />
               <Route exact path="/" component={ Home } />
-              <Route path="/products" component={ Products } />
+              <Route path="/products" render={() => <Products products={ products }/> } />
             </HashRouter>
           );
         }
