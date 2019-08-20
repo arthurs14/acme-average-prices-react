@@ -31,9 +31,19 @@
         );
       }
 
-      const Home = () => {
+      const Home = ({ products }) => {
+        const totals = products.map(product => {
+          const average = (product.companies.reduce((acc, val) => acc += val.price, 0)) / product.companies.length;
+          return average;
+        });
+        const average = totals.reduce((acc, num) => acc += num ,0) / totals.length;
+        console.log(totals);
+        console.log(average);
         return (
-          <h1>Home Page</h1>
+          <div>
+          We have {products.length} products with an average price of
+          ${average.toFixed(2)}
+          </div>
         );
       }
 
@@ -101,8 +111,11 @@
           return (
             <HashRouter>
               <Route render={() => <Nav /> } />
-              <Route exact path="/" component={ Home } />
-              <Route path="/products" render={() => <Products products={ products }/> } />
+              <Switch>
+                <Route exact path="/" render={() => <Home products={ products } /> } />
+                <Route path="/products" render={() => <Products products={ products }/> } />
+                <Redirect to='/' />
+              </Switch>
             </HashRouter>
           );
         }
